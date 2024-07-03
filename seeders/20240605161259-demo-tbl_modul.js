@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,9 +9,36 @@ module.exports = {
         {
           id_guru: "1",
           title: "Melatih Kejayaan dengan Qur'an Hadist",
-          content : "lorem ipsumasdaslkdjalsj alskdjlaskj dalskjd",
-          status_post : "active",
-          image : "",
+          subtitle:
+            "lorem ipsum asdjalksjdlajsldkaslkjdlkaj sldkaj slkdasdlaksjdlaksjda",
+          content: "lorem ipsumasdaslkdjalsj alskdjlaskj dalskjd",
+          status_post: "Active",
+          image: "",
+          for_class: "X",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id_guru: "1",
+          title: "Melatih Kejayaan dengan Qur'an Hadist",
+          subtitle:
+            "lorem ipsum asdjalksjdlajsldkaslkjdlkaj sldkaj slkdasdlaksjdlaksjda",
+          content: "lorem ipsumasdaslkdjalsj alskdjlaskj dalskjd",
+          status_post: "Active",
+          image: "",
+          for_class: "XI",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id_guru: "1",
+          title: "Melatih Kejayaan dengan Qur'an Hadist",
+          subtitle:
+            "lorem ipsum asdjalksjdlajsldkaslkjdlkaj sldkaj slkdasdlaksjdlaksjda",
+          content: "lorem ipsumasdaslkdjalsj alskdjlaskj dalskjd",
+          status_post: "Active",
+          image: "",
+          for_class: "XII",
           createdAt: new Date(),
           updatedAt: new Date(),
         },

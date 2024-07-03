@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
 import {
   Login,
   handleGetRoot,
@@ -43,19 +44,46 @@ import {
   getDataPostById,
   updateDataPost,
 } from "../controllers/HandlerPost.js";
-import { readWhenClickedModul } from "../controllers/HandlerAction.js";
+import {
+  Dashboard,
+  readWhenClickedModul,
+} from "../controllers/HandlerAction.js";
 export const router = express.Router();
 
 export const prefix = "/v1/api/";
 
+//FOR UPLOUD FILE
+
 //ROUTE ACTION
 router.post(prefix + "read-modul/:id", verifyToken, readWhenClickedModul);
+
+//UPLOUAD IMAGE
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/image");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+// Multer upload configuration
+const upload = multer({ storage });
+
+// Last Uploud
 
 //ROUTE GENERAL
 router.get(prefix, handleGetRoot);
 router.get(prefix + "profile", verifyToken, whoAmI);
 router.post(prefix + "login", Login);
 router.delete(prefix + "logout", verifyToken, Logout);
+router.get(prefix + "dashboard", verifyToken, Dashboard);
 
 //ROUTE DATA GURU
 router.get(prefix + "guru", verifyToken, getDataGuru);
@@ -82,8 +110,18 @@ router.post(prefix + "class/add", verifyToken, createClass);
 router.get(prefix + "modul", verifyToken, getDataModul);
 router.get(prefix + "modul/byid/:id", verifyToken, getDataModulById);
 router.delete(prefix + "modul/delete/:id", verifyToken, deleteModul);
-router.put(prefix + "modul/update/:id", verifyToken, updateDataModul);
-router.post(prefix + "modul/add", verifyToken, createModul);
+router.put(
+  prefix + "modul/update/:id",
+  verifyToken,
+  upload.single("image"),
+  updateDataModul
+);
+router.post(
+  prefix + "modul/add",
+  verifyToken,
+  upload.single("image"),
+  createModul
+);
 router.get(prefix + "modul/siswa", verifyToken, getDataModulForSiswa);
 
 //ROUTE DATA CLASS POST

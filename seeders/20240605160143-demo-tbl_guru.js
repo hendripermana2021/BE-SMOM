@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 const bcrypt = require("bcrypt");
@@ -10,12 +10,24 @@ module.exports = {
         {
           name_guru: "Yudi",
           sex: "L",
-          bid_pendidikan : "Qur'an Hadist",
-          pendidikan : "S1",
-          email :"yudhi@gmail.com",
-          password : await bcrypt.hash("12345", 10),
-          real_password : "12345",
-          role_id : "1",
+          bid_pendidikan: "Qur'an Hadist",
+          pendidikan: "S1",
+          email: "yudhi@gmail.com",
+          password: await bcrypt.hash("12345", 10),
+          real_password: "12345",
+          role_id: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name_guru: "guru",
+          sex: "L",
+          bid_pendidikan: "Qur'an Hadist",
+          pendidikan: "S1",
+          email: "guru@gmail.com",
+          password: await bcrypt.hash("12345", 10),
+          real_password: "12345",
+          role_id: "2",
           createdAt: new Date(),
           updatedAt: new Date(),
         },

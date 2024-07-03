@@ -8,27 +8,42 @@ const Class = db.tbl_class;
 
 export const getDataSiswa = async (req, res) => {
   try {
-    const { id } = req.params;
+    let user;
+    if (req.user.role_id === 1) {
+      user = await Siswa.findAll({
+        include: { model: Class, as: "kelas" },
+      });
+    } else {
+      user = await Siswa.findAll({
+        include: {
+          model: Class,
+          as: "kelas",
+          where: { id_walkes: req.user.userId },
+        },
+      });
+    }
 
-    const user = await Siswa.findAll({
-      include: { model: Class, as: "kelas" },
-    });
-
-    if (user == "") {
+    if (!user.length) {
       return res.status(400).json({
         code: 400,
         status: false,
         msg: "Data Doesn't Exist",
       });
     }
+
     res.status(200).json({
       code: 200,
       status: true,
-      msg: "data you searched Found",
+      msg: "Data you searched found",
       data: user,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({
+      code: 500,
+      status: false,
+      msg: "Internal Server Error",
+    });
   }
 };
 

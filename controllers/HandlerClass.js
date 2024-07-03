@@ -130,18 +130,18 @@ export const deleteClass = async (req, res) => {
   }
 };
 export const createClass = async (req, res) => {
-  const { id_walkes, name_classs } = req.body;
+  const { id_walkes, name_class } = req.body;
 
   try {
     // Membuat kelas baru
     const classNew = await Class.create({
       id_walkes,
-      name_classs,
+      name_class,
     });
 
     // Memberikan respons dengan data kelas yang baru dibuat
-    res.status(200).json({
-      code: 200,
+    res.status(201).json({
+      code: 201,
       status: true,
       msg: "Kelas baru berhasil dibuat",
       data: classNew, // Menggunakan variabel yang benar untuk data respons

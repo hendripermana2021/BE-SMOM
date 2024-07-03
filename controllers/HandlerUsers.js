@@ -216,9 +216,7 @@ export const Logout = async (req, res) => {
 
 export const getDataGuru = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const user = await Guru.findAll({ include: { model: Class, as: "kelas" } });
+    const user = await Guru.findAll();
 
     if (user == "") {
       return res.status(400).json({

@@ -13,7 +13,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       id_guru: DataTypes.INTEGER,
       title: DataTypes.STRING,
+      subtitle: DataTypes.STRING,
       content: DataTypes.TEXT,
+      for_class: DataTypes.STRING,
       status_post: DataTypes.STRING,
       image: DataTypes.STRING,
     },

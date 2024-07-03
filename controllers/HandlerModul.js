@@ -2,23 +2,33 @@ import db from "../models/index.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
+import ServerMain from "../index.js";
 
 const Modul = db.tbl_modul;
 const Reference = db.tbl_reference;
-const Homework = db.tbl_status_homework;
 const Readviews = db.tbl_readviews;
 const Guru = db.tbl_guru;
-const Assignment = db.tbl_modul_assignment;
+const Siswa = db.tbl_siswa;
+const Class = db.tbl_class;
 
 export const getDataModul = async (req, res) => {
   try {
+    const { role_id, userId } = req.user;
+    let whereClause = {};
+
+    // Menentukan whereClause berdasarkan role_id
+    if (role_id == 2) {
+      whereClause = { id_guru: userId };
+    }
+
     // Ambil semua data modul termasuk data referensi yang terkait
     const modul = await Modul.findAll({
+      where: whereClause,
       include: [
         { model: Reference, as: "referensi" },
         { model: Readviews, as: "views" },
         { model: Guru, as: "publisher" },
-      ], // 'referensi' harus dalam tanda kutip
+      ],
     });
 
     // Cek apakah data modul ditemukan
@@ -50,19 +60,21 @@ export const getDataModul = async (req, res) => {
 export const getDataModulForSiswa = async (req, res) => {
   try {
     // Ambil semua data modul termasuk data referensi yang terkait
-    const assignment = await Assignment.findAll({
-      where: { id_class: req.siswa.id_class },
+    const siswa = await Siswa.findOne({
+      where: { id: req.user.userId },
+      include: { model: Class, as: "kelas" },
+    });
+    const modul = await Modul.findAll({
+      where: { for_class: siswa.kelas.grade_class },
       include: [
-        {
-          model: Modul,
-          as: "modul",
-          include: { model: Guru, as: "publisher" },
-        },
+        { model: Reference, as: "referensi" },
+        { model: Readviews, as: "views" },
+        { model: Guru, as: "publisher" },
       ], // 'referensi' harus dalam tanda kutip
     });
 
     // Cek apakah data modul ditemukan
-    if (!assignment || assignment.length === 0) {
+    if (!modul || modul.length === 0) {
       return res.status(404).json({
         code: 404,
         status: false,
@@ -75,7 +87,7 @@ export const getDataModulForSiswa = async (req, res) => {
       code: 200,
       status: true,
       msg: "Data found",
-      data: assignment,
+      data: modul,
     });
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -162,10 +174,15 @@ export const deleteModul = async (req, res) => {
 };
 
 export const createModul = async (req, res) => {
-  const { title, content } = req.body;
-  const references = req.body.references;
+  // Extract title, content, and for_class from request body
+  const { title, content, for_class } = req.body;
 
-  // Validasi input
+  // Check if file is uploaded
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  // Validate input
   if (!title || !content) {
     return res.status(400).json({
       code: 400,
@@ -175,15 +192,17 @@ export const createModul = async (req, res) => {
   }
 
   try {
-    // Buat modul baru
+    // Create new module with uploaded file path
     const newModul = await Modul.create({
       id_guru: req.user.userId,
       title,
       content,
-      status_post: "active",
+      for_class,
+      status_post: "Active",
+      image: `http://localhost:8000/image/${req.file.filename}`, // Save the image path
     });
 
-    // Mengirimkan respons dengan status 201 Created
+    // Send response with status 201 Created
     res.status(201).json({
       code: 201,
       status: true,
@@ -191,9 +210,9 @@ export const createModul = async (req, res) => {
       data: newModul,
     });
   } catch (error) {
-    console.error("Error while creating new modul:", error);
+    console.error("Error while creating new module:", error);
 
-    // Mengirimkan respons dengan status 500 Internal Server Error
+    // Send response with status 500 Internal Server Error
     res.status(500).json({
       code: 500,
       status: false,
@@ -204,7 +223,7 @@ export const createModul = async (req, res) => {
 
 export const updateDataModul = async (req, res) => {
   const { id } = req.params;
-  const { title, content, status_post } = req.body;
+  const { title, content, status_post, for_class } = req.body;
 
   // Validasi input
   if (!title || !content) {
@@ -235,7 +254,9 @@ export const updateDataModul = async (req, res) => {
       {
         title,
         content,
+        for_class,
         status_post,
+        image: `http://localhost:8000/image/${req.file.filename}`, // Save the image path
       },
       {
         where: { id },
